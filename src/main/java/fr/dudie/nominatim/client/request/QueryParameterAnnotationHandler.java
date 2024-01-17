@@ -87,7 +87,7 @@ class QueryParameterAnnotationHandler {
                 final String paramFormat = paramMetadata.value();
                 String paramValue = serialize(paramMetadata, fieldValue, f.getName());
 
-                if (null != paramValue && !"".equals(paramValue.trim())) {
+                if (null != paramValue && !paramValue.trim().isEmpty()) {
                     if (s.length() > 0) {
                         s.append('&');
                     }
