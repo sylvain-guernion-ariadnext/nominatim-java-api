@@ -30,13 +30,8 @@ import fr.dudie.nominatim.model.Address;
 import fr.dudie.nominatim.model.BoundingBox;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -86,11 +81,8 @@ public final class JsonNominatimClientTest {
         PROPS.load(in);
 
         LOGGER.info("Preparing http client");
-        final SchemeRegistry registry = new SchemeRegistry();
-        registry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-        final ClientConnectionManager connexionManager = new SingleClientConnManager(null, registry);
 
-        final HttpClient httpClient = new DefaultHttpClient(connexionManager, null);
+        final CloseableHttpClient httpClient = HttpClients.createDefault();
 
         final String baseUrl = PROPS.getProperty("nominatim.server.url");
         final String email = PROPS.getProperty("nominatim.headerEmail");
@@ -135,7 +127,7 @@ public final class JsonNominatimClientTest {
             LOGGER.debug(ToStringBuilder
                     .reflectionToString(address, ToStringStyle.MULTI_LINE_STYLE));
         }
-        assertTrue("list is not empty", !addresses.isEmpty());
+        assertFalse("list is not empty", addresses.isEmpty());
 
         LOGGER.info("testSearchWithResults.end");
     }
@@ -152,7 +144,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.search(request);
 
         assertNotNull("result list is never null", addresses);
-        assertTrue("list is not empty", !addresses.isEmpty());
+        assertFalse("list is not empty", addresses.isEmpty());
 
         for (final Address address : addresses) {
             final Geometry geom = address.getGeojson();
@@ -189,7 +181,7 @@ public final class JsonNominatimClientTest {
             LOGGER.debug(ToStringBuilder
                     .reflectionToString(address, ToStringStyle.MULTI_LINE_STYLE));
         }
-        assertTrue("list is not empty", !addresses.isEmpty());
+        assertFalse("list is not empty", addresses.isEmpty());
 
         LOGGER.info("testSearchWithResults.end");
     }
@@ -237,7 +229,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.search(r);
 
         assertNotNull("result list is not null", addresses);
-        assertTrue("there is more than one result", addresses.size() > 0);
+        assertFalse("there is more than one result", addresses.isEmpty());
         for (final Address address : addresses) {
             assertNotNull("address details are available in result", address.getAddressElements());
             assertTrue("at least one address detail is available", address.getAddressElements().length > 0);
@@ -257,7 +249,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.search(r);
 
         assertNotNull("result list is not null", addresses);
-        assertTrue("there is more than one result", addresses.size() > 0);
+        assertFalse("there is more than one result", addresses.isEmpty());
         for (final Address address : addresses) {
             assertNotNull("address details are available in result", address.getNameDetails());
             assertTrue("at least one address detail is available", address.getNameDetails().length > 0);
@@ -277,7 +269,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.search(r);
 
         assertNotNull("result list is not null", addresses);
-        assertTrue("there is more than one result", addresses.size() > 0);
+        assertFalse("there is more than one result", addresses.isEmpty());
         for (final Address address : addresses) {
             assertNull("address details are not available in result", address.getAddressElements());
         }
@@ -302,7 +294,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.lookupAddress(r);
 
         assertNotNull("result list is not null", addresses);
-        assertTrue("there is more than one result", addresses.size() > 0);
+        assertFalse("there is more than one result", addresses.isEmpty());
         for (final Address address : addresses) {
             assertNotNull("address details are available in result", address.getAddressElements());
             assertTrue("at least one address detail is available", address.getAddressElements().length > 0);
@@ -328,7 +320,7 @@ public final class JsonNominatimClientTest {
         final List<Address> addresses = nominatimClient.lookupAddress(r);
 
         assertNotNull("result list is not null", addresses);
-        assertTrue("there is more than one result", addresses.size() > 0);
+        assertFalse("there is more than one result", addresses.isEmpty());
         for (final Address address : addresses) {
             assertNull("address details are not available in result", address.getAddressElements());
         }
