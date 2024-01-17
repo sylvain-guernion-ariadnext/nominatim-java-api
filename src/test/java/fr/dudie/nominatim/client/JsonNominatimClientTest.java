@@ -22,7 +22,7 @@ package fr.dudie.nominatim.client;
  * [/license]
  */
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.github.filosganga.geogson.model.Geometry;
 import fr.dudie.nominatim.client.request.NominatimLookupRequest;
 import fr.dudie.nominatim.client.request.NominatimSearchRequest;
 import fr.dudie.nominatim.client.request.paramhelper.PolygonFormat;
@@ -30,8 +30,8 @@ import fr.dudie.nominatim.model.Address;
 import fr.dudie.nominatim.model.BoundingBox;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -147,9 +147,9 @@ public final class JsonNominatimClientTest {
         assertFalse("list is not empty", addresses.isEmpty());
 
         for (final Address address : addresses) {
-            final Geometry geom = address.getGeojson();
+            final Geometry<?> geom = address.getGeojson();
             assertNotNull("geometry/geojson of address is available in result", geom);
-            assertTrue("geometry/geojson of address has at least one vertex", geom.getNumPoints() > 0);
+            assertTrue("geometry/geojson of address has at least one vertex", geom.size() > 0);
         }
 
         LOGGER.info("testSearchWithGeoJsonResults.end");
