@@ -22,8 +22,8 @@ package fr.dudie.nominatim.model;
  * [/license]
  */
 
+import com.github.filosganga.geogson.model.Geometry;
 import com.google.gson.annotations.SerializedName;
-import com.vividsolutions.jts.geom.Geometry;
 import java.io.Serializable;
 
 /**

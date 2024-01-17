@@ -26,20 +26,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ResponseHandler;
 
 import com.google.gson.Gson;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 /**
  * Parses a json response from the Nominatim API for a reverse geocoding request.
  * 
  * @author Jérémie Huchet
  */
-public final class NominatimResponseHandler<T> implements ResponseHandler<T> {
+public final class NominatimResponseHandler<T> implements HttpClientResponseHandler<T> {
 
     /** Gson instance for Nominatim API calls. */
     private final Gson gsonInstance;
@@ -64,27 +65,27 @@ public final class NominatimResponseHandler<T> implements ResponseHandler<T> {
     /**
      * {@inheritDoc}
      * 
-     * @see org.apache.http.client.ResponseHandler#handleResponse(org.apache.http.HttpResponse)
+     * @see org.apache.hc.core5.http.io.HttpClientResponseHandler#handleResponse(org.apache.hc.core5.http.ClassicHttpResponse)
      */
     @Override
-    public T handleResponse(final HttpResponse response) throws IOException {
+    public T handleResponse(final ClassicHttpResponse response) throws IOException {
 
         InputStream content = null;
         final T addresses;
 
         try {
-            final StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-                throw new IOException(String.format("HTTP error: %s %s", status.getStatusCode(), status.getReasonPhrase()));
+            final int status = response.getCode();
+            if (status >= HttpStatus.SC_BAD_REQUEST) {
+                throw new IOException(String.format("HTTP error: %s %s", status, response.getReasonPhrase()));
             }
             content = response.getEntity().getContent();
             addresses = gsonInstance
-                    .fromJson(new InputStreamReader(content, "utf-8"), responseType);
+                    .fromJson(new InputStreamReader(content, StandardCharsets.UTF_8), responseType);
         } finally {
             if (null != content) {
                 content.close();
             }
-            response.getEntity().consumeContent();
+            EntityUtils.consume(response.getEntity());
         }
 
         return addresses;

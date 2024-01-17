@@ -27,8 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +67,6 @@ public final class JsonNominatimClient implements NominatimClient {
     
     /** UTF-8 encoding.*/
     public static final String ENCODING_UTF_8 = "UTF-8";
-
-    /** Gson instance for Nominatim API calls. */
-    private final Gson gsonInstance;
 
     /** The url to make search queries. */
     private final String searchUrl;
@@ -125,7 +122,7 @@ public final class JsonNominatimClient implements NominatimClient {
 
     /**
      * Creates the json nominatim client.
-     * 
+     *
      * @param baseUrl
      *            the nominatim server url
      * @param httpClient
@@ -182,7 +179,8 @@ public final class JsonNominatimClient implements NominatimClient {
         gsonBuilder.registerTypeAdapterFactory(new JtsAdapterFactory());
         gsonBuilder.registerTypeAdapterFactory(new GeometryAdapterFactory());
 
-        gsonInstance = gsonBuilder.create();
+        /** Gson instance for Nominatim API calls. */
+        Gson gsonInstance = gsonBuilder.create();
 
         // prepare httpclient
         this.httpClient = httpClient;
